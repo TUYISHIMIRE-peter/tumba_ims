@@ -1,0 +1,78 @@
+{% extends 'dashboard/base.html' %}
+{% load humanize %}
+
+{% block title %}
+  outgoing
+{% endblock %}
+
+{% block content %}
+  <header class="flex justify-between">
+    <div>
+      <strong>DASHBOARD</strong>
+      <i class="fa fa-caret-right" aria-hidden="true"></i>
+      OUTGOING
+    </div>
+  </header>
+
+  <div class="my-3">
+    {% include "messages.html" %}
+  </div>
+
+  <div class="my-5">
+    {% if not outgoings %}
+      <div class="bg-gray-700 rounded p-2">No outgoing products available</div>
+    {% else %}
+      <div class="bg-slate-900 shadow rounded p-3 overflow-auto">
+        <table class="w-full">
+          <thead>
+            <tr>
+              <th class="text-start border border-gray-700 px-2 py-1 uppercase whitespace-nowrap">Date out</th>
+              <th class="text-start border border-gray-700 px-2 py-1 uppercase whitespace-nowrap">Product name</th>
+              <th class="text-start border border-gray-700 px-2 py-1 uppercase whitespace-nowrap">Product Category</th>
+              <th class="text-start border border-gray-700 px-2 py-1 uppercase whitespace-nowrap">Product quantity</th>
+              <th class="text-start border border-gray-700 px-2 py-1 uppercase whitespace-nowrap">Product price</th>
+              <th class="text-start border border-gray-700 px-2 py-1 uppercase whitespace-nowrap">Date in</th>
+              <th class="text-start border border-gray-700 px-2 py-1 uppercase whitespace-nowrap">Exporter</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for outgoing in outgoings %}
+            {% if outgoing.product.creator == request.user %}
+              <tr>
+                <td class="text-start border border-gray-700 px-2 whitespace-nowrap">{{ outgoing.outDate }}</td>
+                <td class="text-start border border-gray-700 px-2 whitespace-nowrap"><span class="capitalize">
+                  
+                  {% if "exported#" in outgoing.product.name %}
+                    {{ outgoing.product.name|slice:"9:" }}
+                  {% else %}
+                    {{ outgoing.product.name }}
+                  {% endif %}
+                    
+                </span></td>
+                <td class="text-start border border-gray-700 px-2 whitespace-nowrap">{{ outgoing.product.category.title }}</td>
+                <td class="text-start border border-gray-700 px-2 whitespace-nowrap">{{ outgoing.quantity }}</td>
+                <td class="text-start border border-gray-700 px-2 whitespace-nowrap">{{ outgoing.product.price|intcomma }} RWF</td>
+                <td class="text-start border border-gray-700 px-2 whitespace-nowrap">{{ outgoing.product.inDate }}</td>
+                <td class="text-start border border-gray-700 px-2 whitespace-nowrap">
+                  <a href="/dashboard/user/{{ outgoing.product.creator.id }}/view" class="hover:text-orange-400">
+                    <span class="uppercase">{{ outgoing.product.creator.first_name }}</span>
+                    <span class="capitalize">{{ outgoing.product.creator.last_name }}</span>
+                  </a>
+                </td>
+              </tr>
+              {% endif %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endif %}
+  </div>
+  <script>
+    //outgoing/<int:id>
+      const confirmDelete= id =>{
+        if(confirm("Are you sure to delete this record?")){
+          window.location = `/dashboard/outgoing/${id}`
+        }
+      }
+  </script>
+{% endblock %}
